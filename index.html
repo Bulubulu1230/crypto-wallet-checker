@@ -16,9 +16,6 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #e4e4e4;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
@@ -26,8 +23,9 @@
             background: rgba(30, 30, 46, 0.95);
             border-radius: 20px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
+            margin: 0 auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -47,6 +45,135 @@
             color: #a0a0a0;
             margin-bottom: 30px;
             font-size: 0.9rem;
+        }
+
+        /* How to Use Section */
+        .how-to-use {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .how-to-use h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #d0d0d0;
+            font-size: 0.95rem;
+        }
+
+        /* Features Section */
+        .features {
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .features h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #b0b0b0;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #d0d0d0;
+            font-size: 0.9rem;
+        }
+
+        .feature-icon {
+            color: #4ade80;
+            font-size: 1.1rem;
+        }
+
+        /* Example Addresses Section */
+        .examples {
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .examples h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #b0b0b0;
+        }
+
+        .example-address {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-address:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateX(5px);
+        }
+
+        .example-address:last-child {
+            margin-bottom: 0;
+        }
+
+        .example-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .example-addr {
+            color: #a0a0a0;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
         }
 
         .input-group {
@@ -212,6 +339,14 @@
             .balance-value {
                 font-size: 1.5rem;
             }
+
+            .steps {
+                gap: 10px;
+            }
+
+            .step-text {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -219,6 +354,61 @@
     <div class="container">
         <h1>🔐 Crypto Wallet Checker</h1>
         <p class="subtitle">Check Ethereum wallet balance instantly</p>
+
+        <!-- How to Use Section -->
+        <div class="how-to-use">
+            <h2>📖 How to Use</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Enter an Ethereum wallet address (0x...)</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Click "Check Balance" button</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">View real-time balance in ETH and USD</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features">
+            <h2>✨ Features</h2>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <span>Real-time balance checking</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">💵</span>
+                    <span>Automatic USD conversion</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🌐</span>
+                    <span>Multi-chain support (Ethereum mainnet)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example Addresses Section -->
+        <div class="examples">
+            <h2>🔍 Try Example Addresses</h2>
+            <div class="example-address" onclick="fillAddress('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045')">
+                <div class="example-label">Vitalik Buterin's Wallet</div>
+                <div class="example-addr">0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045</div>
+            </div>
+            <div class="example-address" onclick="fillAddress('0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe')">
+                <div class="example-label">Ethereum Foundation</div>
+                <div class="example-addr">0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe</div>
+            </div>
+            <div class="example-address" onclick="fillAddress('0x00000000219ab540356cBB839Cbe05303d7705Fa')">
+                <div class="example-label">Ethereum 2.0 Deposit Contract</div>
+                <div class="example-addr">0x00000000219ab540356cBB839Cbe05303d7705Fa</div>
+            </div>
+        </div>
 
         <div class="input-group">
             <label for="walletAddress">Ethereum Wallet Address</label>
@@ -256,6 +446,12 @@
         const ETHERSCAN_API = 'https://api.etherscan.io/api';
         const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price';
 
+        function fillAddress(address) {
+            document.getElementById('walletAddress').value = address;
+            // Optionally auto-check after filling
+            checkBalance();
+        }
+
         async function checkBalance() {
             const walletAddress = document.getElementById('walletAddress').value.trim();
             const button = document.getElementById('checkButton');
@@ -268,12 +464,12 @@
 
             // Validate input
             if (!walletAddress) {
-                showError('Please enter a wallet address');
+                showError('⚠️ Please enter a wallet address. You can try one of the example addresses above!');
                 return;
             }
 
             if (!walletAddress.match(/^0x[a-fA-F0-9]{40}$/)) {
-                showError('Invalid Ethereum address format');
+                showError('❌ Invalid Ethereum address format. Address must start with "0x" followed by 40 hexadecimal characters.');
                 return;
             }
 
@@ -315,7 +511,7 @@
                 resultDiv.classList.add('show');
 
             } catch (error) {
-                showError(`Error: ${error.message}`);
+                showError(`❌ Error: ${error.message}`);
             } finally {
                 // Re-enable button
                 button.disabled = false;
