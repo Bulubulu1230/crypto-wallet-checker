@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Wallet Balance Checker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+
+        .search-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chain-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chain-btn {
+            padding: 12px 24px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .chain-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .chain-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        input[type="text"]::placeholder {
+            color: #808080;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .total-value {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .total-value h2 {
+            color: #a0a0a0;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .total-value .amount {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .wallet-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .info-item .label {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .info-item .value {
+            color: #e0e0e0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .tokens-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tokens-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .token-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .token-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .token-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .token-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .token-details h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .token-details .balance {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        .token-value {
+            text-align: right;
+        }
+
+        .token-value .usd {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4ade80;
+        }
+
+        .token-value .price {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .chart-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="text"] {
+                min-width: 100%;
+            }
+
+            .total-value .amount {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Crypto Wallet Checker</h1>
+            <p class="subtitle">Multi-chain wallet balance tracker with real-time USD values</p>
+        </header>
+
+        <div class="search-section">
+            <div class="chain-selector">
+                <button class="chain-btn active" data-chain="eth">Ethereum</button>
+                <button class="chain-btn" data-chain="bsc">BSC</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="walletAddress" placeholder="Enter wallet address (0x...)" />
+                <button class="btn" id="checkBtn">Check Balance</button>
+            </div>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Fetching wallet data...</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="summary-card">
+                <div class="total-value">
+                    <h2>Total Portfolio Value</h2>
+                    <div class="amount" id="totalValue">$0.00</div>
+                </div>
+                <div class="wallet-info">
+                    <div class="info-item">
+                        <div class="label">Chain</div>
+                        <div class="value" id="chainName">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Wallet Address</div>
+                        <div class="value" id="walletAddr" style="font-size: 0.9rem;">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Total Tokens</div>
+                        <div class="value" id="tokenCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tokens-section">
+                <h3>💰 Token Balances</h3>
+                <div class="token-list" id="tokenList"></div>
+            </div>
+
+            <div class="chart-section">
+                <h3>📊 Portfolio Distribution</h3>
+                <canvas id="portfolioChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedChain = 'eth';
+        let chartInstance = null;
+
+        // Chain configuration
+        const chainConfig = {
+            eth: {
+                name: 'Ethereum',
+                apiUrl: 'https://api.etherscan.io/api',
+                apiKey: '', // Free tier, no key needed for basic queries
+                nativeSymbol: 'ETH',
+                nativeName: 'Ethereum'
+            },
+            bsc: {
+                name: 'Binance Smart Chain',
+                apiUrl: 'https://api.bscscan.com/api',
+                apiKey: '',
+                nativeSymbol: 'BNB',
+                nativeName: 'BNB'
+            }
+        };
+
+        // Chain selector
+        document.querySelectorAll('.chain-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.chain-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedChain = btn.dataset.chain;
+            });
+        });
+
+        // Check button
+        document.getElementById('checkBtn').addEventListener('click', checkWallet);
+        document.getElementById('walletAddress').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkWallet();
+        });
+
+        async function checkWallet() {
+            const address = document.getElementById('walletAddress').value.trim();
+            
+            if (!address || !address.match(/^0x[a-fA-F0-9]{40}$/)) {
+                showError('Please enter a valid wallet address');
+                return;
+            }
+
+            hideError();
+            showLoading();
+            hideResults();
+
+            try {
+                const config = chainConfig[selectedChain];
+                
+                // Fetch native balance
+                const nativeBalance = await getNativeBalance(address, config);
+                
+                // Fetch token balances
+                const tokens = await getTokenBalances(address, config);
+                
+                // Get USD prices
+                const prices = await getPrices(tokens, config);
+                
+                // Calculate total value
+                const nativeValue = nativeBalance * (prices[config.nativeSymbol.toLowerCase()] || 0);
+                let totalValue = nativeValue;
+                
+                const tokensWithValue = tokens.map(token => {
+                    const price = prices[token.symbol.toLowerCase()] || 0;
+                    const value = token.balance * price;
+                    totalValue += value;
+                    return { ...token, price, value };
+                });
+
+                // Add native token to list
+                const allTokens = [
+                    {
+                        name: config.nativeName,
+                        symbol: config.nativeSymbol,
+                        balance: nativeBalance,
+                        price: prices[config.nativeSymbol.toLowerCase()] || 0,
+                        value: nativeValue,
+                        decimals: 18
+                    },
+                    ...tokensWithValue
+                ].filter(t => t.balance > 0).sort((a, b) => b.value - a.value);
+
+                displayResults(address, config, allTokens, totalValue);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to fetch wallet data. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function getNativeBalance(address, config) {
+            const url = `${config.apiUrl}?module=account&action=balance&address=${address}&tag=latest`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.status === '1') {
+                return parseFloat(data.result) / 1e18;
+            }
+            return 0;
+        }
+
+        async function getTokenBalances(address, config) {
+            const url = `${config.apiUrl}?module=account&action=tokentx&address=${address}&page=1&offset=100&sort=desc`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.status !== '1' || !data.result) return [];
+            
+            // Get unique tokens
+            const tokenMap = new Map();
+            
+            for (const tx of data.result) {
+                if (!tokenMap.has(tx.contractAddress)) {
+                    tokenMap.set(tx.contractAddress, {
+                        address: tx.contractAddress,
+                        name: tx.tokenName,
+                        symbol: tx.tokenSymbol,
+                        decimals: parseInt(tx.tokenDecimal)
+                    });
+                }
+            }
+            
+            // Fetch balance for each token
+            const tokens = [];
+            for (const [contractAddress, token] of tokenMap) {
+                try {
+                    const balanceUrl = `${config.apiUrl}?module=account&action=tokenbalance&contractaddress=${contractAddress}&address=${address}&tag=latest`;
+                    const balanceResponse = await fetch(balanceUrl);
+                    const balanceData = await balanceResponse.json();
+                    
+                    if (balanceData.status === '1') {
+                        const balance = parseFloat(balanceData.result) / Math.pow(10, token.decimals);
+                        if (balance > 0) {
+                            tokens.push({ ...token, balance });
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching balance for ${token.symbol}:`, error);
+                }
+            }
+            
+            return tokens;
+        }
+
+        async function getPrices(tokens, config) {
+            const symbols = [config.nativeSymbol.toLowerCase(), ...tokens.map(t => t.symbol.toLowerCase())];
+            const uniqueSymbols = [...new Set(symbols)].slice(0, 20); // Limit to 20 tokens
+            
+            try {
+                // Map common symbols to CoinGecko IDs
+                const symbolToId = {
+                    'eth': 'ethereum',
+                    'bnb': 'binancecoin',
+                    'usdt': 'tether',
+                    'usdc': 'usd-coin',
+                    'busd': 'binance-usd',
+                    'dai': 'dai',
+                    'weth': 'weth',
+                    'wbnb': 'wbnb',
+                    'btc': 'bitcoin',
+                    'link': 'chainlink',
+                    'uni': 'uniswap',
+                    'aave': 'aave',
+                    'matic': 'matic-network',
+                    'shib': 'shiba-inu',
+                    'cake': 'pancakeswap-token'
+                };
+                
+                const ids = uniqueSymbols.map(s => symbolToId[s] || s).join(',');
+                const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const prices = {};
+                for (const symbol of uniqueSymbols) {
+                    const id = symbolToId[symbol] || symbol;
+                    if (data[id] && data[id].usd) {
+                        prices[symbol] = data[id].usd;
+                    }
+                }
+                
+                return prices;
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+                return {};
+            }
+        }
+
+        function displayResults(address, config, tokens, totalValue) {
+            // Update summary
+            document.getElementById('totalValue').textContent = `$${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('chainName').textContent = config.name;
+            document.getElementById('walletAddr').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+            document.getElementById('tokenCount').textContent = tokens.length;
+
+            // Display tokens
+            const tokenList = document.getElementById('tokenList');
+            tokenList.innerHTML = '';
+            
+            tokens.forEach(token => {
+                const tokenItem = document.createElement('div');
+                tokenItem.className = 'token-item';
+                tokenItem.innerHTML = `
+                    <div class="token-info">
+                        <div class="token-icon">${token.symbol.charAt(0)}</div>
+                        <div class="token-details">
+                            <h4>${token.name}</h4>
+                            <div class="balance">${token.balance.toLocaleString('en-US', { maximumFractionDigits: 6 })} ${token.symbol}</div>
+                        </div>
+                    </div>
+                    <div class="token-value">
+                        <div class="usd">$${token.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        <div class="price">@ $${token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
+                    </div>
+                `;
+                tokenList.appendChild(tokenItem);
+            });
+
+            // Create chart
+            createChart(tokens);
+
+            showResults();
+        }
+
+        function createChart(tokens) {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const topTokens = tokens.slice(0, 10);
+            
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: topTokens.map(t => t.symbol),
+                    datasets: [{
+                        data: topTokens.map(t => t.value),
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#4facfe',
+                            '#43e97b', '#fa709a', '#fee140', '#30cfd0',
+                            '#a8edea', '#fed6e3'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e0e0',
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(2);
+                                    return `${label}: $${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function hideResults() {
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('errorMsg').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
